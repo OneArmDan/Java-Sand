@@ -19,5 +19,4 @@ public class MainFrame extends JFrame{
         pack();
         this.setLocationRelativeTo(null);
     }
-
 }
