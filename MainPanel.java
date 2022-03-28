@@ -5,9 +5,11 @@ import javax.swing.*;
 public class MainPanel extends JPanel implements ActionListener {
     static final int WIDTH = 800;
     static final int HEIGHT = 800;
-    static final int PIX_SIZE = 16;
+    static final int PIX_SIZE = 64;
     static final int GAME_PIX = (WIDTH*HEIGHT)/PIX_SIZE;
     static final int DELAY = 40;
+    static final int WIDTH_MAX = WIDTH - WIDTH%PIX_SIZE;
+    static final int HEIGHT_MAX = HEIGHT - HEIGHT%PIX_SIZE;
     
     boolean isPress = false;
     boolean isQPress = false;
@@ -16,8 +18,7 @@ public class MainPanel extends JPanel implements ActionListener {
     Timer timer;
 
     Board board = new Board();
-    Board tboard = new Board();
-    Particle selected = new Particle(1); //dust by default
+    Particle selected = new Particle(1); //sand by default
 
     long startTick = 0;
     long endTick = 0;
@@ -50,7 +51,7 @@ public class MainPanel extends JPanel implements ActionListener {
     }
     //methods
     public static boolean isInBounds(int x, int y) {
-        if(x > WIDTH - PIX_SIZE || x < 0 || y > HEIGHT - PIX_SIZE || y < 0) return false;
+        if(x > WIDTH_MAX - 1 || x < 0 || y > HEIGHT_MAX - 1 || y < 0) return false;
         else return true;
     }
 
@@ -65,10 +66,10 @@ public class MainPanel extends JPanel implements ActionListener {
     }
 
     public void draw(Graphics g){
-        if(isQPress == true) selected = new Particle(2);// if q is down, stone
+        if(isQPress) selected = new Particle(2);// if q is down, stone
         else selected = new Particle(1);//default sand
 
-        if (isPress && spawnDelay <= 0){
+        if (isPress && isInBounds(mouseX, mouseY) && spawnDelay <= 0){
             board.insertParticle(mouseX, mouseY, selected);
             spawnDelay++;
         } 
@@ -82,7 +83,7 @@ public class MainPanel extends JPanel implements ActionListener {
         g.drawString("X: " + mouseX + ", Y: " + mouseY, mouseX, mouseY); //mouse coords on cursor
         drawFPSCounter(g);
 
-        board.calcDown(tboard);
+        board.calcDown();
     }
 
     public void drawFPSCounter(Graphics g) {
@@ -138,17 +139,17 @@ public class MainPanel extends JPanel implements ActionListener {
     public class MyMouseMotionAdapter extends MouseMotionAdapter {
         @Override
         public void mouseMoved(MouseEvent e) {
-            setMouseX(e.getX());
-            setMouseY(e.getY());
+            if (isInBounds(e.getX(), e.getY())) {
+                setMouseX(e.getX());
+                setMouseY(e.getY());
+            }
         }
         @Override
         public void mouseDragged(MouseEvent e) {
-            int mouseX = e.getX();
-            int mouseY = e.getY();
             //board.insertParticle(mouseX, mouseY, selected);
-            if (isInBounds(mouseX, mouseY)){
-                setMouseX(mouseX);
-                setMouseY(mouseY);
+            if (isInBounds(e.getX(), e.getY())){
+                setMouseX(e.getX());
+                setMouseY(e.getY());
             }
             //System.out.println(board.boardToString());
         }

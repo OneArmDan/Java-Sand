@@ -24,7 +24,7 @@ public class Particle {
             case 1:
             color = Color.orange;
             density = 1;
-            name = "dirt";
+            name = "sand";
             id = 1;
             break;
             case 2:
