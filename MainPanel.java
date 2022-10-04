@@ -7,7 +7,7 @@ public class MainPanel extends JPanel implements ActionListener {
     static final int HEIGHT = 800;
     static final int PIX_SIZE = 16;
     static final int GAME_PIX = (WIDTH*HEIGHT)/PIX_SIZE;
-    static final int DELAY = 40;
+    static final int DELAY = 0;
     
     boolean isPress = false;
     boolean isQPress = false;
@@ -15,8 +15,8 @@ public class MainPanel extends JPanel implements ActionListener {
     int mouseY;
     Timer timer;
 
-    Board board = new Board();
-    Board tboard = new Board();
+    Board gameBoard = new Board();
+    Board tempBoard = new Board();
     Particle selected = new Particle(1); //dust by default
 
     long startTick = 0;
@@ -68,9 +68,8 @@ public class MainPanel extends JPanel implements ActionListener {
         if(isQPress == true) selected = new Particle(2);// if q is down, stone
         else selected = new Particle(1);//default sand
 
-        if (isPress && spawnDelay <= 0){
-            board.insertParticle(mouseX, mouseY, selected);
-            spawnDelay++;
+        if (isPress ){
+            gameBoard.insertParticle(mouseX, mouseY, selected);
         } 
         else spawnDelay = 0;
         drawBoard(g);
@@ -79,10 +78,10 @@ public class MainPanel extends JPanel implements ActionListener {
         drawGrid(g);
 
         g.setColor(Color.white);
-        g.drawString("X: " + mouseX + ", Y: " + mouseY, mouseX, mouseY); //mouse coords on cursor
+        g.drawString("X: " + mouseX + ", Y: " + mouseY + " " + Board.getMousePartData(mouseX, mouseY, gameBoard), mouseX, mouseY); //mouse coords on cursor
         drawFPSCounter(g);
 
-        board.calcDown(tboard);
+        gameBoard.calcDown(tempBoard);
     }
 
     public void drawFPSCounter(Graphics g) {
@@ -93,10 +92,10 @@ public class MainPanel extends JPanel implements ActionListener {
     }
 
     public void drawBoard(Graphics g) {
-        for (int i = 0; i < board.getBoard().size(); i++) {
-            for (int j = 0; j < board.getBoard().get(i).size(); j++) {
-                g.setColor(board.getElement(j, i).getColor());
-                g.fillRect(j * PIX_SIZE, i * PIX_SIZE, PIX_SIZE, PIX_SIZE);
+        for (int y = 0; y < gameBoard.getBoard().size(); y++) {
+            for (int x = 0; x < gameBoard.getBoard().get(y).size(); x++) {
+                g.setColor(gameBoard.getElement(x, y).getColor());
+                g.fillRect(x * PIX_SIZE, y * PIX_SIZE, PIX_SIZE, PIX_SIZE);
             }
         }
     }

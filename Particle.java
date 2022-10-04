@@ -5,6 +5,8 @@ public class Particle {
     private float density;
     private String name;
     private int id;
+    private int x;
+    private int y;
 
     //constructor
     Particle(Color color, String name, int id, float density) {
@@ -24,7 +26,7 @@ public class Particle {
             case 1:
             color = Color.orange;
             density = 1;
-            name = "dirt";
+            name = "dust";
             id = 1;
             break;
             case 2:
@@ -50,6 +52,16 @@ public class Particle {
     public void setId(int id) {
         this.id = id;
     }
+    public void setX(int x) {
+        this.x = x;
+    }
+    public void setY(int y) {
+        this.y = y;
+    }
+    public void setXY(int x, int y) {
+        this.x = x;
+        this.y = y;
+    }
     //getters
     public Color getColor() {
         return color;
@@ -62,5 +74,11 @@ public class Particle {
     }
     public int getId() {
         return id;
+    }
+    public int getX() {
+        return x;
+    }
+    public int getY() {
+        return y;
     }
 }

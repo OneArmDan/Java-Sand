@@ -5,7 +5,7 @@ public class Board {
     final static int BOARD_WIDTH = MainPanel.GAME_PIX/MainPanel.WIDTH;
     ArrayList<ArrayList<Particle>> board = new ArrayList<ArrayList<Particle>>(BOARD_HEIGHT);
 
-    //constructor
+    //constructors
     Board() {
         for (int i = 0; i < BOARD_HEIGHT; i++) {
             ArrayList<Particle> tempW = new ArrayList<Particle>(BOARD_WIDTH);
@@ -49,6 +49,11 @@ public class Board {
     public void insertParticle(int x, int y, Particle element){
         board.get(y/MainPanel.PIX_SIZE).set(x/MainPanel.PIX_SIZE, element);
     }
+    public static String getMousePartData(int x, int y, Board board){
+        Particle element = board.getElement(x/MainPanel.PIX_SIZE, y/MainPanel.PIX_SIZE);
+        String string = element.getName() + " D:" + element.getDensity();
+        return string;
+    }
     public String boardToString() {
         String str = "";
         for (int i = 0; i < board.size(); i++) {
@@ -73,35 +78,47 @@ public class Board {
         setBoard(x, y, lessDense);
         setBoard(x - 1, y + 1, moreDense);
     }
+    public void goRight(int x, int y, Particle lessDense, Particle moreDense){
+        setBoard(x, y, lessDense);
+        setBoard(x + 1, y, moreDense);
+    }
+    public void goLeft(int x, int y, Particle lessDense, Particle moreDense){
+        setBoard(x, y, lessDense);
+        setBoard(x - 1, y, moreDense);
+    }
     public void calcDown(Board tboard) {
         
-        for (int y = 0; y < Board.BOARD_HEIGHT; y++) {
+        for (int y = Board.BOARD_HEIGHT - 1; y > 0; y--) {
             for (int x = 0; x < Board.BOARD_WIDTH; x++) {
                 Particle element = getElement(x, y);
-                if(element.getDensity() > 0 && y < Board.BOARD_HEIGHT - 1 && element.getDensity() > getElement(x, y + 1).getDensity()){ //if off ground and below is less dense
-                    tboard.downOne(x, y, getElement(x, y + 1), getElement(x, y));//go down once
-                }
-                else if (y < Board.BOARD_HEIGHT - 1) {//if off ground
-                    Particle belowElement = getElement(x, y + 1);
-                    if (element.getDensity() <= belowElement.getDensity()) {//if belowElement is not less dense
+                if(element.getDensity() >= 0){//if not air
+                    if(y < Board.BOARD_HEIGHT - 1 && element.getDensity() > getElement(x, y + 1).getDensity()) //if off ground and below is less dense
+                        tboard.downOne(x, y, getElement(x, y + 1), getElement(x, y));//go down once
+                    
+                    else if (y < Board.BOARD_HEIGHT - 1) {//if off ground, but below is more dense
                         if(x < Board.BOARD_WIDTH - 1 && x > 0) { //if not touching either border
                             Particle rightElement = getElement(x + 1, y);
+                            rightElement.setXY(x + 1, y);
                             Particle bRightElement = getElement(x + 1, y + 1);
+                            bRightElement.setXY(x + 1, y + 1);
                             Particle leftElement = getElement(x - 1, y);
+                            leftElement.setXY(x - 1, y);
                             Particle bLeftElement = getElement(x - 1, y + 1);
-                        
-                            if (element.getDensity() > bRightElement.getDensity() && element.getDensity() > bLeftElement.getDensity()) {//if both sides are less dense
-                                if(rightElement.getDensity() <= bRightElement.getDensity()) //if right is less dense than br
-                                    tboard.downRight(x, y, bRightElement, element);
-                                else if (leftElement.getDensity() <= bLeftElement.getDensity()) //if left is less dense than bl
-                                    tboard.downLeft(x, y, bLeftElement, element);
-                            }
-                            else if (element.getDensity() > bRightElement.getDensity() && rightElement.getDensity() <= bRightElement.getDensity()) // if only right side is less dense
+                            bLeftElement.setXY(x - 1, y + 1);
+                            if (element.getDensity() > bRightElement.getDensity() && rightElement.getDensity() <= bRightElement.getDensity()) // if only right side is less dense
                                 tboard.downRight(x, y, bRightElement, element);
                             else if (element.getDensity() > bLeftElement.getDensity() && leftElement.getDensity() <= bLeftElement.getDensity()) // if only left side is less dense
                                 tboard.downLeft(x, y, bLeftElement, element);
 
-                        }//if not touching either border
+                            /*if(nearElements.size() > 0){//if there are lighter elements nearby
+                                int randNum = (int)(Math.random() * nearElements.size());// random number from 0 to nearElements.size()
+                                Particle air = new Particle(0);
+                                Particle randElement = nearElements.get(randNum);
+                                randElement.getX(); randElement.getY();
+                                setBoard(x, y, air);
+                                setBoard(randElement.getX(), randElement.getY(), element);
+                            }*/
+                        }
                         else if (x <= 0){//if touching left border
                             Particle rightElement = getElement(x + 1, y);
                             Particle bRightElement = getElement(x + 1, y + 1);
@@ -114,9 +131,9 @@ public class Board {
                             if (element.getDensity() > bLeftElement.getDensity() && leftElement.getDensity() <= bLeftElement.getDensity()) // if only left side is less dense
                                 tboard.downLeft(x, y, bLeftElement, element);
                         }
-                    }//if belowElement is more dense
-                }//if off ground
-            }
+                    }
+                }
+            }   
         }
         for (int y = 0; y < Board.BOARD_HEIGHT; y++) {
             for (int x = 0; x < Board.BOARD_WIDTH; x++) {
