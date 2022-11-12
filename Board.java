@@ -1,11 +1,12 @@
 import java.util.ArrayList;
 
 public class Board { 
-    final static int BOARD_HEIGHT = MainPanel.GAME_PIX/MainPanel.HEIGHT;
-    final static int BOARD_WIDTH = MainPanel.GAME_PIX/MainPanel.WIDTH;
-    ArrayList<ArrayList<Particle>> board = new ArrayList<ArrayList<Particle>>(BOARD_HEIGHT);
+    final static int BOARD_HEIGHT = MainPanel.GAME_PIX/MainPanel.HEIGHT;    //The number of y elements on the board 2d array
+    final static int BOARD_WIDTH = MainPanel.GAME_PIX/MainPanel.WIDTH;      //The number of x elements on the board 2d array
+    ArrayList<ArrayList<Particle>> board = new ArrayList<ArrayList<Particle>>(BOARD_HEIGHT);    //2d array of particles
 
-    //constructors
+    //constructors ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    //creates a board filled with "air"
     Board() {
         for (int i = 0; i < BOARD_HEIGHT; i++) {
             ArrayList<Particle> tempW = new ArrayList<Particle>(BOARD_WIDTH);
@@ -17,16 +18,8 @@ public class Board {
         System.out.println("BOARD CREATED");
     }
 
-    Board(ArrayList<ArrayList<Particle>> newBoard) {
-        for (int y = 0; y < BOARD_HEIGHT; y++) {
-            this.board.add(newBoard.get(y));
-            for (int x = 0; x < BOARD_WIDTH; x++) {
-                this.board.get(y).add(x, newBoard.get(y).get(x));
-            }
-        }
-    }
-
-    //setters
+    //setters ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    //sets all of this board's values equal to a given board
     public void setBoard(ArrayList<ArrayList<Particle>> newBoard) {
         for (int y = 0; y < BOARD_HEIGHT; y++) {
             this.board.add(newBoard.get(y));
@@ -35,25 +28,35 @@ public class Board {
             }
         }
     }
+
+    //sets the value of an element to a given particle
     public void setBoard(int x, int y, Particle element){
         this.board.get(y).set(x, element);
     }
-    //getters
+
+    //getters ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     public ArrayList<ArrayList<Particle>> getBoard() {
         return board;
     }
     public Particle getElement(int x, int y) {
         return board.get(y).get(x);
     }
-    //methods
+
+    //static methods ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    //takes mouse coordinates and inserts the given element
     public void insertParticle(int x, int y, Particle element){
         board.get(y/MainPanel.PIX_SIZE).set(x/MainPanel.PIX_SIZE, element);
     }
+
+    //shows the name and density of a given particle at the mouse cursor
     public static String getMousePartData(int x, int y, Board board){
         Particle element = board.getElement(x/MainPanel.PIX_SIZE, y/MainPanel.PIX_SIZE);
         String string = element.getName() + " D:" + element.getDensity();
         return string;
     }
+
+    //methods ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    //converts a 2d array into a string, for debugging
     public String boardToString() {
         String str = "";
         for (int i = 0; i < board.size(); i++) {
@@ -66,26 +69,34 @@ public class Board {
         System.out.println("BOARDTOSTRING");
         return str;
     }
+
+    //moves an element down once
     public void downOne(int x, int y, Particle lessDense, Particle moreDense) {
         setBoard(x, y, lessDense);
         setBoard(x, y + 1, moreDense);
     }
+    //moves an element down and right once
     public void downRight(int x, int y, Particle lessDense, Particle moreDense) {
         setBoard(x, y, lessDense);
         setBoard(x + 1, y + 1, moreDense);
     }
+    //moves an element down and left once
     public void downLeft(int x, int y, Particle lessDense, Particle moreDense) {
         setBoard(x, y, lessDense);
         setBoard(x - 1, y + 1, moreDense);
     }
+    //moves an element right once
     public void goRight(int x, int y, Particle lessDense, Particle moreDense){
         setBoard(x, y, lessDense);
         setBoard(x + 1, y, moreDense);
     }
+    //moves an element left once
     public void goLeft(int x, int y, Particle lessDense, Particle moreDense){
         setBoard(x, y, lessDense);
         setBoard(x - 1, y, moreDense);
     }
+
+    //big boi function that attempts to calculate how every element should move
     public void calcDown(Board tboard) {
         
         for (int y = Board.BOARD_HEIGHT - 1; y > 0; y--) {

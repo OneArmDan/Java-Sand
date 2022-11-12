@@ -7,7 +7,7 @@ public class MainFrame extends JFrame{
     Font medFont = new Font("Century", Font.PLAIN, 14);
     JButton selectButton = new JButton("Select");
     
-    MainPanel panel = new MainPanel();
+    MainPanel panel = new MainPanel(); //holds the game graphics
     
     public MainFrame(){
         super("Java 2D");
