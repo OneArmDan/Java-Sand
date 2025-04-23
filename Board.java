@@ -70,6 +70,21 @@ public class Board {
         return str;
     }
 
+    public int particleCount() {
+        int count = 0;
+        int partType = 0;
+        for (int i = 0; i < board.size(); i++) {
+            ArrayList<Particle> iList = board.get(i);
+            for (int j = 0; j < board.get(i).size(); j++) {
+                partType = iList.get(j).getId();
+                if (partType != 0) {
+                    count += 1;
+                }
+            }
+        }
+        return count;
+    }
+
     //moves an element down once
     public void downOne(int x, int y, Particle lessDense, Particle moreDense) {
         setBoard(x, y, lessDense);
@@ -104,22 +119,22 @@ public class Board {
                 Particle element = getElement(x, y);
                 if(element.getDensity() >= 0){//if not air
                     if(y < Board.BOARD_HEIGHT - 1 && element.getDensity() > getElement(x, y + 1).getDensity()) //if off ground and below is less dense
-                        tboard.downOne(x, y, getElement(x, y + 1), getElement(x, y));//go down once
+                        downOne(x, y, getElement(x, y + 1), getElement(x, y));//go down once
                     
                     else if (y < Board.BOARD_HEIGHT - 1) {//if off ground, but below is more dense
                         if(x < Board.BOARD_WIDTH - 1 && x > 0) { //if not touching either border
                             Particle rightElement = getElement(x + 1, y);
-                            rightElement.setXY(x + 1, y);
+                            //rightElement.setXY(x + 1, y);
                             Particle bRightElement = getElement(x + 1, y + 1);
-                            bRightElement.setXY(x + 1, y + 1);
+                            //bRightElement.setXY(x + 1, y + 1);
                             Particle leftElement = getElement(x - 1, y);
-                            leftElement.setXY(x - 1, y);
+                            //leftElement.setXY(x - 1, y);
                             Particle bLeftElement = getElement(x - 1, y + 1);
-                            bLeftElement.setXY(x - 1, y + 1);
+                            //bLeftElement.setXY(x - 1, y + 1);
                             if (element.getDensity() > bRightElement.getDensity() && rightElement.getDensity() <= bRightElement.getDensity()) // if only right side is less dense
-                                tboard.downRight(x, y, bRightElement, element);
+                                downRight(x, y, bRightElement, element);
                             else if (element.getDensity() > bLeftElement.getDensity() && leftElement.getDensity() <= bLeftElement.getDensity()) // if only left side is less dense
-                                tboard.downLeft(x, y, bLeftElement, element);
+                                downLeft(x, y, bLeftElement, element);
 
                             /*if(nearElements.size() > 0){//if there are lighter elements nearby
                                 int randNum = (int)(Math.random() * nearElements.size());// random number from 0 to nearElements.size()
@@ -134,22 +149,22 @@ public class Board {
                             Particle rightElement = getElement(x + 1, y);
                             Particle bRightElement = getElement(x + 1, y + 1);
                             if (element.getDensity() > bRightElement.getDensity() && rightElement.getDensity() <= bRightElement.getDensity()) // if only right side is less dense
-                                tboard.downRight(x, y, bRightElement, element);
+                                downRight(x, y, bRightElement, element);
                         }
                         else if(x >= Board.BOARD_WIDTH - 1){//if touching right border
                             Particle leftElement = getElement(x - 1, y);
                             Particle bLeftElement = getElement(x - 1, y + 1);
                             if (element.getDensity() > bLeftElement.getDensity() && leftElement.getDensity() <= bLeftElement.getDensity()) // if only left side is less dense
-                                tboard.downLeft(x, y, bLeftElement, element);
+                                downLeft(x, y, bLeftElement, element);
                         }
                     }
                 }
             }   
         }
-        for (int y = 0; y < Board.BOARD_HEIGHT; y++) {
-            for (int x = 0; x < Board.BOARD_WIDTH; x++) {
-                setBoard(x, y, tboard.getElement(x, y));
-            }
-        }
+        // for (int y = 0; y < Board.BOARD_HEIGHT; y++) {
+        //     for (int x = 0; x < Board.BOARD_WIDTH; x++) {
+        //         setBoard(x, y, tboard.getElement(x, y));
+        //     }
+        // }
     }
 }

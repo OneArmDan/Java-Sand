@@ -3,14 +3,15 @@ import java.awt.*;
 import javax.swing.*;
 
 public class MainPanel extends JPanel implements ActionListener {
-    static final int WIDTH = 800;
-    static final int HEIGHT = 800;
+    static final int WIDTH = 768;
+    static final int HEIGHT = 768;
     static final int PIX_SIZE = 16;
     static final int GAME_PIX = (WIDTH*HEIGHT)/PIX_SIZE;
     static final int DELAY = 0;
     
     boolean isMousePress = false;
     boolean qToggle = false;        //toggels between stone and sand
+    boolean particleCountButton = false;
     int mouseX;
     int mouseY;
     Timer timer;
@@ -69,15 +70,17 @@ public class MainPanel extends JPanel implements ActionListener {
 
     //Gets called every loop, my gameloop
     public void draw(Graphics g){
-        if(qToggle == true) selected = new Particle(2);// if q is down, stone
+        if (qToggle == true) selected = new Particle(2);// if q is down, stone
         else selected = new Particle(1);//default sand
+
+        if (particleCountButton) System.out.println(gameBoard.particleCount());
 
         if (isMousePress)
             gameBoard.insertParticle(mouseX, mouseY, selected);
         
         drawBoard(g);
         
-        g.setColor(Color.black);
+        g.setColor(Color.gray);
         drawGrid(g);
 
         g.setColor(Color.white);
@@ -87,7 +90,7 @@ public class MainPanel extends JPanel implements ActionListener {
         gameBoard.calcDown(tempBoard);
     }
 
-    //Draws the FPS counter on the top right
+    //Draws the FPS counter on the top left
     public void drawFPSCounter(Graphics g) {
         startTick = System.currentTimeMillis();
         between = (startTick + 1 - endTick);
@@ -127,6 +130,10 @@ public class MainPanel extends JPanel implements ActionListener {
             if(e.getKeyCode() == KeyEvent.VK_Q){//toggles qToggle when q is pressed
                 if(qToggle == false) qToggle = true; 
                 else if (qToggle == true) qToggle = false;
+            }
+            if(e.getKeyCode() == KeyEvent.VK_E){
+                if(particleCountButton == false) particleCountButton = true;
+                else if (particleCountButton == true) particleCountButton = false;
             }
         }
     }
