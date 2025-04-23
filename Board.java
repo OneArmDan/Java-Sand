@@ -2,19 +2,19 @@ import java.util.ArrayList;
 import java.util.concurrent.ThreadLocalRandom;
 
 public class Board { 
-    final static int BOARD_HEIGHT = MainPanel.GAME_PIX/MainPanel.HEIGHT;    //The number of y elements on the board 2d array
-    final static int BOARD_WIDTH = MainPanel.GAME_PIX/MainPanel.WIDTH;      //The number of x elements on the board 2d array
-    ArrayList<ArrayList<Particle>> board = new ArrayList<ArrayList<Particle>>(BOARD_HEIGHT);    //2d array of particles
+    final static int BOARD_HEIGHT_IN_CELLS = MainPanel.GAME_PIX/MainPanel.HEIGHT;    //The number of y elements on the board 2d array
+    final static int BOARD_WIDTH_IN_CELLS = MainPanel.GAME_PIX/MainPanel.WIDTH;      //The number of x elements on the board 2d array
+    ArrayList<ArrayList<Particle>> board = new ArrayList<ArrayList<Particle>>(BOARD_HEIGHT_IN_CELLS);    //2d array of particles
 
     //constructors ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     //creates a board filled with "air"
     Board() {
-        for (int i = 0; i < BOARD_HEIGHT; i++) {
-            ArrayList<Particle> tempW = new ArrayList<Particle>(BOARD_WIDTH);
-            for (int j = 0; j < BOARD_WIDTH; j++) {
-                tempW.add(new Particle(0));
+        for (int i = 0; i < BOARD_HEIGHT_IN_CELLS; i++) {
+            ArrayList<Particle> row = new ArrayList<Particle>(BOARD_WIDTH_IN_CELLS);
+            for (int j = 0; j < BOARD_WIDTH_IN_CELLS; j++) {
+                row.add(new Particle(0));
             }
-            board.add(tempW);
+            board.add(row);
         }
         System.out.println("BOARD CREATED");
     }
@@ -22,36 +22,36 @@ public class Board {
     //setters ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     //sets all of this board's values equal to a given board
     public void setBoard(ArrayList<ArrayList<Particle>> newBoard) {
-        for (int y = 0; y < BOARD_HEIGHT; y++) {
-            this.board.add(newBoard.get(y));
-            for (int x = 0; x < BOARD_WIDTH; x++) {
-                this.board.get(y).add(x, newBoard.get(y).get(x));
+        for (int rowIndex = 0; rowIndex < BOARD_HEIGHT_IN_CELLS; rowIndex++) {
+            this.board.add(newBoard.get(rowIndex));
+            for (int columnIndex = 0; columnIndex < BOARD_WIDTH_IN_CELLS; columnIndex++) {
+                this.board.get(rowIndex).add(columnIndex, newBoard.get(rowIndex).get(columnIndex));
             }
         }
     }
 
     //sets the value of an element to a given particle
-    public void setBoard(int x, int y, Particle element){
-        this.board.get(y).set(x, element);
+    public void setBoard(int columnIndex, int rowIndex, Particle element){
+        this.board.get(rowIndex).set(columnIndex, element);
     }
 
     //getters ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     public ArrayList<ArrayList<Particle>> getBoard() {
         return board;
     }
-    public Particle getElement(int x, int y) {
-        return board.get(y).get(x);
+    public Particle getElement(int columnIndex, int rowIndex) {
+        return board.get(rowIndex).get(columnIndex);
     }
 
     //static methods ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     //takes mouse coordinates and inserts the given element
-    public void insertParticle(int x, int y, Particle element){
-        board.get(y/MainPanel.PIX_SIZE).set(x/MainPanel.PIX_SIZE, element);
+    public void insertParticle(int columnIndex, int rowIndex, Particle element){
+        board.get(rowIndex/MainPanel.PIX_SIZE).set(columnIndex/MainPanel.PIX_SIZE, element);
     }
 
     //shows the name and density of a given particle at the mouse cursor
-    public static String getMousePartData(int x, int y, Board board){
-        Particle element = board.getElement(x/MainPanel.PIX_SIZE, y/MainPanel.PIX_SIZE);
+    public static String getMousePartData(int columnIndex, int rowIndex, Board board){
+        Particle element = board.getElement(columnIndex/MainPanel.PIX_SIZE, rowIndex/MainPanel.PIX_SIZE);
         String string = element.getName() + " D:" + element.getDensity();
         return string;
     }
@@ -61,9 +61,9 @@ public class Board {
     public String boardToString() {
         String str = "";
         for (int i = 0; i < board.size(); i++) {
-            ArrayList<Particle> iList = board.get(i);
+            ArrayList<Particle> currentRow = board.get(i);
             for (int j = 0; j < board.get(i).size(); j++) {
-                str = str + iList.get(j).getId();
+                str = str + currentRow.get(j).getId();
             }
             str = str + "\n";
         }
@@ -73,12 +73,12 @@ public class Board {
 
     public int particleCount() {
         int count = 0;
-        int partType = 0;
+        int particleTpe = 0;
         for (int i = 0; i < board.size(); i++) {
-            ArrayList<Particle> iList = board.get(i);
+            ArrayList<Particle> currentRow = board.get(i);
             for (int j = 0; j < board.get(i).size(); j++) {
-                partType = iList.get(j).getId();
-                if (partType != 0) {
+                particleTpe = currentRow.get(j).getId();
+                if (particleTpe != 0) {
                     count += 1;
                 }
             }
@@ -87,29 +87,29 @@ public class Board {
     }
 
     //moves an element down once
-    public void downOne(int x, int y, Particle lessDense, Particle moreDense) {
-        setBoard(x, y, lessDense);
-        setBoard(x, y + 1, moreDense);
+    public void moveDownOne(int columnIndex, int rowIndex, Particle lessDense, Particle moreDense) {
+        setBoard(columnIndex, rowIndex, lessDense);
+        setBoard(columnIndex, rowIndex + 1, moreDense);
     }
     //moves an element down and right once
-    public void downRight(int x, int y, Particle lessDense, Particle moreDense) {
-        setBoard(x, y, lessDense);
-        setBoard(x + 1, y + 1, moreDense);
+    public void moveDownRight(int columnIndex, int rowIndex, Particle lessDense, Particle moreDense) {
+        setBoard(columnIndex, rowIndex, lessDense);
+        setBoard(columnIndex + 1, rowIndex + 1, moreDense);
     }
     //moves an element down and left once
-    public void downLeft(int x, int y, Particle lessDense, Particle moreDense) {
-        setBoard(x, y, lessDense);
-        setBoard(x - 1, y + 1, moreDense);
+    public void moveDownLeft(int columnIndex, int rowIndex, Particle lessDense, Particle moreDense) {
+        setBoard(columnIndex, rowIndex, lessDense);
+        setBoard(columnIndex - 1, rowIndex + 1, moreDense);
     }
     //moves an element right once
-    public void goRight(int x, int y, Particle lessDense, Particle moreDense){
-        setBoard(x, y, lessDense);
-        setBoard(x + 1, y, moreDense);
+    public void moveRight(int columnIndex, int rowIndex, Particle lessDense, Particle moreDense){
+        setBoard(columnIndex, rowIndex, lessDense);
+        setBoard(columnIndex + 1, rowIndex, moreDense);
     }
     //moves an element left once
-    public void goLeft(int x, int y, Particle lessDense, Particle moreDense){
-        setBoard(x, y, lessDense);
-        setBoard(x - 1, y, moreDense);
+    public void moveLeft(int columnIndex, int rowIndex, Particle lessDense, Particle moreDense){
+        setBoard(columnIndex, rowIndex, lessDense);
+        setBoard(columnIndex - 1, rowIndex, moreDense);
     }
     // Check if a particle can move to a target position
     private boolean canMove(Particle current, Particle target, Particle adjacent) {
@@ -117,59 +117,59 @@ public class Board {
     }
 
     // Handle diagonal movement
-    private void handleDiagonalMovement(int x, int y, Particle element) {
-        Particle rightElement = getElement(x + 1, y);
-        Particle bRightElement = getElement(x + 1, y + 1);
-        Particle leftElement = getElement(x - 1, y);
-        Particle bLeftElement = getElement(x - 1, y + 1);
+    private void handleDiagonalMovement(int columnIndex, int rowIndex, Particle element) {
+        Particle rightElement = getElement(columnIndex + 1, rowIndex);
+        Particle bRightElement = getElement(columnIndex + 1, rowIndex + 1);
+        Particle leftElement = getElement(columnIndex - 1, rowIndex);
+        Particle bLeftElement = getElement(columnIndex - 1, rowIndex + 1);
 
         boolean leftLight = canMove(element, bLeftElement, leftElement);
         boolean rightLight = canMove(element, bRightElement, rightElement);
 
         if (leftLight && rightLight) {
             if (ThreadLocalRandom.current().nextInt(2) == 0) {
-                downLeft(x, y, bLeftElement, element);
+                moveDownLeft(columnIndex, rowIndex, bLeftElement, element);
             } else {
-                downRight(x, y, bRightElement, element);
+                moveDownRight(columnIndex, rowIndex, bRightElement, element);
             }
         } else if (leftLight) {
-            downLeft(x, y, bLeftElement, element);
+            moveDownLeft(columnIndex, rowIndex, bLeftElement, element);
         } else if (rightLight) {
-            downRight(x, y, bRightElement, element);
+            moveDownRight(columnIndex, rowIndex, bRightElement, element);
         }
     }
 
     // calcDown function
     public void calcDown() {
-        for (int y = Board.BOARD_HEIGHT - 1; y > 0; y--) {
-            for (int x = 0; x < Board.BOARD_WIDTH; x++) {
-                Particle element = getElement(x, y);
+        for (int rowIndex = Board.BOARD_HEIGHT_IN_CELLS - 1; rowIndex > 0; rowIndex--) {
+            for (int columnIndex = 0; columnIndex < Board.BOARD_WIDTH_IN_CELLS; columnIndex++) {
+                Particle element = getElement(columnIndex, rowIndex);
 
                 // Skip if the element is already at the bottom
-                if (y >= Board.BOARD_HEIGHT - 1) continue;
+                if (rowIndex >= Board.BOARD_HEIGHT_IN_CELLS - 1) continue;
 
-                Particle belowElement = getElement(x, y + 1);
+                Particle belowElement = getElement(columnIndex, rowIndex + 1);
 
                 // Move directly down if possible
                 if (element.getDensity() > belowElement.getDensity()) {
-                    downOne(x, y, belowElement, element);
+                    moveDownOne(columnIndex, rowIndex, belowElement, element);
                     continue;
                 }
 
                 // Handle diagonal movement
-                if (x > 0 && x < Board.BOARD_WIDTH - 1) {
-                    handleDiagonalMovement(x, y, element);
-                } else if (x == 0) { // Left border
-                    Particle bRightElement = getElement(x + 1, y + 1);
-                    Particle rightElement = getElement(x + 1, y);
+                if (columnIndex > 0 && columnIndex < Board.BOARD_WIDTH_IN_CELLS - 1) {
+                    handleDiagonalMovement(columnIndex, rowIndex, element);
+                } else if (columnIndex == 0) { // Left border
+                    Particle bRightElement = getElement(columnIndex + 1, rowIndex + 1);
+                    Particle rightElement = getElement(columnIndex + 1, rowIndex);
                     if (canMove(element, bRightElement, rightElement)) {
-                        downRight(x, y, bRightElement, element);
+                        moveDownRight(columnIndex, rowIndex, bRightElement, element);
                     }
-                } else if (x == Board.BOARD_WIDTH - 1) { // Right border
-                    Particle bLeftElement = getElement(x - 1, y + 1);
-                    Particle leftElement = getElement(x - 1, y);
+                } else if (columnIndex == Board.BOARD_WIDTH_IN_CELLS - 1) { // Right border
+                    Particle bLeftElement = getElement(columnIndex - 1, rowIndex + 1);
+                    Particle leftElement = getElement(columnIndex - 1, rowIndex);
                     if (canMove(element, bLeftElement, leftElement)) {
-                        downLeft(x, y, bLeftElement, element);
+                        moveDownLeft(columnIndex, rowIndex, bLeftElement, element);
                     }
                 }
             }
