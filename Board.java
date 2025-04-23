@@ -111,72 +111,68 @@ public class Board {
         setBoard(x, y, lessDense);
         setBoard(x - 1, y, moreDense);
     }
+    // Check if a particle can move to a target position
+    private boolean canMove(Particle current, Particle target, Particle adjacent) {
+        return current.getDensity() > target.getDensity() && adjacent.getDensity() <= target.getDensity();
+    }
 
-    //big boi function that attempts to calculate how every element should move
-    public void calcDown(Board tboard) {
-        
+    // Handle diagonal movement
+    private void handleDiagonalMovement(int x, int y, Particle element) {
+        Particle rightElement = getElement(x + 1, y);
+        Particle bRightElement = getElement(x + 1, y + 1);
+        Particle leftElement = getElement(x - 1, y);
+        Particle bLeftElement = getElement(x - 1, y + 1);
+
+        boolean leftLight = canMove(element, bLeftElement, leftElement);
+        boolean rightLight = canMove(element, bRightElement, rightElement);
+
+        if (leftLight && rightLight) {
+            if (ThreadLocalRandom.current().nextInt(2) == 0) {
+                downLeft(x, y, bLeftElement, element);
+            } else {
+                downRight(x, y, bRightElement, element);
+            }
+        } else if (leftLight) {
+            downLeft(x, y, bLeftElement, element);
+        } else if (rightLight) {
+            downRight(x, y, bRightElement, element);
+        }
+    }
+
+    // calcDown function
+    public void calcDown() {
         for (int y = Board.BOARD_HEIGHT - 1; y > 0; y--) {
             for (int x = 0; x < Board.BOARD_WIDTH; x++) {
                 Particle element = getElement(x, y);
-                if(element.getDensity() >= 0){//if not air
-                    if(y < Board.BOARD_HEIGHT - 1 && element.getDensity() > getElement(x, y + 1).getDensity()) //if off ground and below is less dense
-                        downOne(x, y, getElement(x, y + 1), getElement(x, y));//go down once
-                    
-                    else if (y < Board.BOARD_HEIGHT - 1) {//if off ground, but below is more dense
-                        if(x < Board.BOARD_WIDTH - 1 && x > 0) { //if not touching either border
-                            Particle rightElement = getElement(x + 1, y);
-                            Particle bRightElement = getElement(x + 1, y + 1);
-                            Particle leftElement = getElement(x - 1, y);
-                            Particle bLeftElement = getElement(x - 1, y + 1);
-                            boolean leftLight = false;
-                            boolean rightLight = false;
 
-                            if (element.getDensity() > bLeftElement.getDensity() && leftElement.getDensity() <= bLeftElement.getDensity()) // if left side is less dense
-                                leftLight = true;
-                            if (element.getDensity() > bRightElement.getDensity() && rightElement.getDensity() <= bRightElement.getDensity()) // if right side is less dense
-                                rightLight = true;
+                // Skip if the element is already at the bottom
+                if (y >= Board.BOARD_HEIGHT - 1) continue;
 
-                            if (leftLight && rightLight){
-                                if (ThreadLocalRandom.current().nextInt(2) == 0) 
-                                    downLeft(x, y, bLeftElement, element);
-                                else 
-                                    downRight(x, y, bRightElement, element);
-                            }
-                            else if (leftLight && !rightLight) 
-                                downLeft(x, y, bLeftElement, element);
-                            else if (rightLight && !leftLight) 
-                                downRight(x, y, bRightElement, element);
-                            
+                Particle belowElement = getElement(x, y + 1);
 
-                            /*if(nearElements.size() > 0){//if there are lighter elements nearby
-                                int randNum = (int)(Math.random() * nearElements.size());// random number from 0 to nearElements.size()
-                                Particle air = new Particle(0);
-                                Particle randElement = nearElements.get(randNum);
-                                randElement.getX(); randElement.getY();
-                                setBoard(x, y, air);
-                                setBoard(randElement.getX(), randElement.getY(), element);
-                            }*/
-                        }
-                        else if (x <= 0){//if touching left border
-                            Particle rightElement = getElement(x + 1, y);
-                            Particle bRightElement = getElement(x + 1, y + 1);
-                            if (element.getDensity() > bRightElement.getDensity() && rightElement.getDensity() <= bRightElement.getDensity()) // if only right side is less dense
-                                downRight(x, y, bRightElement, element);
-                        }
-                        else if(x >= Board.BOARD_WIDTH - 1){//if touching right border
-                            Particle leftElement = getElement(x - 1, y);
-                            Particle bLeftElement = getElement(x - 1, y + 1);
-                            if (element.getDensity() > bLeftElement.getDensity() && leftElement.getDensity() <= bLeftElement.getDensity()) // if only left side is less dense
-                                downLeft(x, y, bLeftElement, element);
-                        }
+                // Move directly down if possible
+                if (element.getDensity() > belowElement.getDensity()) {
+                    downOne(x, y, belowElement, element);
+                    continue;
+                }
+
+                // Handle diagonal movement
+                if (x > 0 && x < Board.BOARD_WIDTH - 1) {
+                    handleDiagonalMovement(x, y, element);
+                } else if (x == 0) { // Left border
+                    Particle bRightElement = getElement(x + 1, y + 1);
+                    Particle rightElement = getElement(x + 1, y);
+                    if (canMove(element, bRightElement, rightElement)) {
+                        downRight(x, y, bRightElement, element);
+                    }
+                } else if (x == Board.BOARD_WIDTH - 1) { // Right border
+                    Particle bLeftElement = getElement(x - 1, y + 1);
+                    Particle leftElement = getElement(x - 1, y);
+                    if (canMove(element, bLeftElement, leftElement)) {
+                        downLeft(x, y, bLeftElement, element);
                     }
                 }
-            }   
+            }
         }
-        // for (int y = 0; y < Board.BOARD_HEIGHT; y++) {
-        //     for (int x = 0; x < Board.BOARD_WIDTH; x++) {
-        //         setBoard(x, y, tboard.getElement(x, y));
-        //     }
-        // }
     }
 }

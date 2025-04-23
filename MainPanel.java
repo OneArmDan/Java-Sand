@@ -87,7 +87,7 @@ public class MainPanel extends JPanel implements ActionListener {
         g.drawString("X: " + mouseX + ", Y: " + mouseY + " " + Board.getMousePartData(mouseX, mouseY, gameBoard), mouseX, mouseY); //mouse coords on cursor
         drawFPSCounter(g);
 
-        gameBoard.calcDown(tempBoard);
+        gameBoard.calcDown();
     }
 
     //Draws the FPS counter on the top left
