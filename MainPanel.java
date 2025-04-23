@@ -7,7 +7,7 @@ public class MainPanel extends JPanel implements ActionListener {
     static final int HEIGHT = 768;
     static final int PIX_SIZE = 16;
     static final int GAME_PIX = (WIDTH*HEIGHT)/PIX_SIZE;
-    static final int DELAY = 0;
+    static final int DELAY = 15;
     
     boolean isMousePress = false;
     boolean qToggle = false;        //toggels between stone and sand

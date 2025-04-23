@@ -1,4 +1,5 @@
 import java.util.ArrayList;
+import java.util.concurrent.ThreadLocalRandom;
 
 public class Board { 
     final static int BOARD_HEIGHT = MainPanel.GAME_PIX/MainPanel.HEIGHT;    //The number of y elements on the board 2d array
@@ -124,17 +125,28 @@ public class Board {
                     else if (y < Board.BOARD_HEIGHT - 1) {//if off ground, but below is more dense
                         if(x < Board.BOARD_WIDTH - 1 && x > 0) { //if not touching either border
                             Particle rightElement = getElement(x + 1, y);
-                            //rightElement.setXY(x + 1, y);
                             Particle bRightElement = getElement(x + 1, y + 1);
-                            //bRightElement.setXY(x + 1, y + 1);
                             Particle leftElement = getElement(x - 1, y);
-                            //leftElement.setXY(x - 1, y);
                             Particle bLeftElement = getElement(x - 1, y + 1);
-                            //bLeftElement.setXY(x - 1, y + 1);
-                            if (element.getDensity() > bRightElement.getDensity() && rightElement.getDensity() <= bRightElement.getDensity()) // if only right side is less dense
-                                downRight(x, y, bRightElement, element);
-                            else if (element.getDensity() > bLeftElement.getDensity() && leftElement.getDensity() <= bLeftElement.getDensity()) // if only left side is less dense
+                            boolean leftLight = false;
+                            boolean rightLight = false;
+
+                            if (element.getDensity() > bLeftElement.getDensity() && leftElement.getDensity() <= bLeftElement.getDensity()) // if left side is less dense
+                                leftLight = true;
+                            if (element.getDensity() > bRightElement.getDensity() && rightElement.getDensity() <= bRightElement.getDensity()) // if right side is less dense
+                                rightLight = true;
+
+                            if (leftLight && rightLight){
+                                if (ThreadLocalRandom.current().nextInt(2) == 0) 
+                                    downLeft(x, y, bLeftElement, element);
+                                else 
+                                    downRight(x, y, bRightElement, element);
+                            }
+                            else if (leftLight && !rightLight) 
                                 downLeft(x, y, bLeftElement, element);
+                            else if (rightLight && !leftLight) 
+                                downRight(x, y, bRightElement, element);
+                            
 
                             /*if(nearElements.size() > 0){//if there are lighter elements nearby
                                 int randNum = (int)(Math.random() * nearElements.size());// random number from 0 to nearElements.size()
